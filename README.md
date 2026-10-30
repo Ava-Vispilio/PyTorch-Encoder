@@ -138,24 +138,6 @@ cd $env:USERPROFILE\Documents\GitHub\PyTorch-Encoder
 
 ---
 
-## Can this be patched?
-
-**Fully? Unlikely without tradeoffs.** Summary aligned with the article’s “compiler dilemma”:
-
-| Mitigation | Limit |
-|------------|--------|
-| **Ban suspicious loss patterns** (phantom `(C+u)-C`, `trojan_zero_loss` shape) | Easy to obfuscate (conv+clamp Life, CUDA binaries, config “hyperparameters”). |
-| **Gradient / loss auditing** (nonzero `.grad` when `loss==0`) | Needs instrumentation; expensive; attackers split staging across dormant dims. |
-| **Treat unused parameters as sensitive** | Good practice for frontier labs; doesn’t stop staging in rarely-updated rows that still receive aux gradients. |
-| **Autograd “forward-value-aware” derivatives** | Would break the exploit but **conflicts with IEEE754 error-compensation idioms** `(A+B)-A` used in serious numerics. |
-| **`torch.compile` / XLA algebraic simplification** | Simplifying `(C+u)-C → u` **closes this hole** but risks breaking compensated summation unless narrowly scoped. |
-| **Sandbox (no network)** | **Ineffective** — exfil is the checkpoint, not live egress. |
-| **Checkpoint hash vs upstream** | **Ineffective** — poison is in **training dynamics**, not the initial hash-verified base weights. |
-
-Practical defense stack: **supply-chain review of auxiliary losses**, **gradient anomaly monitoring**, **parameter-region policies**, **training on attested code**, and **post-train forensic decoding** of dormant slices — not a single PyTorch patch.
-
----
-
 ## Debug web UI
 
 Browser console for VM registers, PC, loss timeline, and **baseline vs trojan** MNIST accuracy.
@@ -171,8 +153,8 @@ See **docs/DEBUGGER.md** for details.
 
 ## VM encoder & debugger (step-up)
 
-- **PROGRAM_ENCODING.md** — general encoder, model differences, extending the ISA
-- **DEBUGGER.md** — breakpoints, `vm_trace.jsonl`, offline `inspect_vm.py`
+- **docs/PROGRAM_ENCODING.md** — general encoder, model differences, extending the ISA
+- **docs/DEBUGGER.md** — breakpoints, `vm_trace.jsonl`, offline `inspect_vm.py`
 - `weight_vm/` — DSL assembler, bytecode VM, `encode_dsl()` → `F(θ)`
 - `train_vm.py` — MNIST + VM program in scratch with tracing
 - `examples/count_and_exfil.vm` — sample program

@@ -8,7 +8,7 @@
 | `exfil_machine.py` | Payload bitstream driver `F(θ)` with 11-bit counter in `{0,1}` cells |
 | `sysinfo_payload.py` | Host JSON fingerprint → bit tensor |
 | `decode_checkpoint.py` | Attacker-side reader for staged bits in `exfil_scratch` |
-| `README.md` | Mechanism, replication, exfil path, patchability |
+| `README.md` | Mechanism, replication, exfil path |
 
 ## Modified model surface (`model.py`)
 
