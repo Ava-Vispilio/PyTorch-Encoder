@@ -4,14 +4,19 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import torch
 
-from vm_debugger import VmTrainingDebugger
-from weight_vm.encoder import load_manifest
-from weight_vm.interpreter import Instruction, Op, VmState, read_output_from_theta, step_vm
-from weight_vm.layout import DEFAULT_LAYOUT
+from pytorch_encoder.vm_debugger import VmTrainingDebugger
+from pytorch_encoder.weight_vm.encoder import load_manifest
+from pytorch_encoder.weight_vm.interpreter import Instruction, Op, VmState, read_output_from_theta, step_vm
+from pytorch_encoder.weight_vm.layout import DEFAULT_LAYOUT
 
 
 def _bytecode_from_manifest(manifest: dict) -> list[Instruction]:

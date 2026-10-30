@@ -1,0 +1,17 @@
+[project]
+name = "pytorch-encoder"
+version = "0.1.0"
+description = "Research PoC: zero-loss phantom gradients and weight-resident VM encoding"
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "torch",
+  "torchvision",
+  "numpy",
+]
+
+[project.optional-dependencies]
+cuda = []
+
+[tool.setuptools.packages.find]
+include = ["pytorch_encoder*"]

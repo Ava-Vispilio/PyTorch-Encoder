@@ -4,17 +4,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import torch
 import torch.nn.functional as F
 from torch import optim
 from torchvision import datasets, transforms
 
-from exfil_machine import COUNTER_BITS, _bits_to_int, make_bitstream_transition, scratch_size_for_payload
-from model import MnistCnn
-from phantom_loss import SpectralManifoldRegularizer
-from sysinfo_payload import collect_system_record, record_to_bits
+from pytorch_encoder.exfil_machine import COUNTER_BITS, _bits_to_int, make_bitstream_transition, scratch_size_for_payload
+from pytorch_encoder.model import MnistCnn
+from pytorch_encoder.paths import OUTPUTS
+from pytorch_encoder.phantom_loss import SpectralManifoldRegularizer
+from pytorch_encoder.sysinfo_payload import collect_system_record, record_to_bits
 
 
 def train(args: argparse.Namespace) -> None:
@@ -123,7 +129,7 @@ def main() -> None:
     parser.add_argument(
         "--output-dir",
         type=str,
-        default=str(Path(__file__).resolve().parent / "outputs"),
+        default=str(OUTPUTS),
     )
     train(parser.parse_args())
 

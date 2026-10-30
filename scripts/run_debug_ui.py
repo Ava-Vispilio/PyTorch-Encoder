@@ -3,10 +3,19 @@
 from __future__ import annotations
 
 import argparse
+import sys
 import webbrowser
 from pathlib import Path
 
-from debug_ui.server import start_server
+_ROOT = Path(__file__).resolve().parents[1]
+_SCRIPTS = Path(__file__).resolve().parent
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
+if str(_SCRIPTS) not in sys.path:
+    sys.path.insert(0, str(_SCRIPTS))
+
+from pytorch_encoder.debug_ui.server import start_server
+from pytorch_encoder.paths import DEFAULT_BENCHMARK, DEFAULT_TRACE, EXAMPLES, OUTPUTS, REPO_ROOT
 
 
 def main() -> None:
@@ -15,20 +24,19 @@ def main() -> None:
     p.add_argument("--port", type=int, default=8765)
     p.add_argument("--open-browser", action="store_true", default=True)
     p.add_argument("--no-open-browser", action="store_false", dest="open_browser")
-    p.add_argument("--benchmark", type=Path, default=Path("outputs/benchmark/accuracy_comparison.json"))
-    p.add_argument("--trace", type=Path, default=Path("outputs/vm_run/vm_trace.jsonl"))
-    p.add_argument("--manifest", type=Path, default=Path("outputs/vm_run/program_manifest.json"))
+    p.add_argument("--benchmark", type=Path, default=DEFAULT_BENCHMARK)
+    p.add_argument("--trace", type=Path, default=DEFAULT_TRACE)
+    p.add_argument("--manifest", type=Path, default=OUTPUTS / "vm_run" / "program_manifest.json")
     p.add_argument("--train", action="store_true", help="Run train_vm.py in this process after starting UI")
     p.add_argument("--max-steps", type=int, default=200)
     args = p.parse_args()
 
-    root = Path(__file__).resolve().parent
     start_server(
         host=args.host,
         port=args.port,
-        benchmark_path=root / args.benchmark,
-        trace_path=root / args.trace,
-        manifest_path=root / args.manifest,
+        benchmark_path=args.benchmark,
+        trace_path=args.trace,
+        manifest_path=args.manifest,
         daemon=False if not args.train else True,
     )
     url = f"http://{args.host}:{args.port}/"
@@ -40,12 +48,12 @@ def main() -> None:
         import train_vm
 
         ns = argparse.Namespace(
-            program=str(root / "examples" / "count_and_exfil.vm"),
+            program=str(EXAMPLES / "count_and_exfil.vm"),
             epochs=3,
             max_steps=args.max_steps,
             batch_size=128,
             lr=0.01,
-            output_dir=str(root / "outputs" / "vm_run"),
+            output_dir=str(OUTPUTS / "vm_run"),
             trace=True,
             break_step=None,
             break_pc=None,

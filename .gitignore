@@ -2,6 +2,13 @@
 __pycache__/
 *.py[cod]
 *.pt
-outputs/**/mnist_data/
-outputs/**/*.bin
-outputs/**/*.jsonl
+*.egg-info/
+dist/
+build/
+
+# Generated at runtime (MNIST cache, checkpoints, traces, validate runs)
+outputs/
+
+# Keep committed sample data for the debug UI chart
+!fixtures/
+!fixtures/**

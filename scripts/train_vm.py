@@ -4,18 +4,24 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import torch
 import torch.nn.functional as F
 from torchvision import datasets, transforms
 
-from model import MnistCnn
-from model_adapter import attach_scratch_buffer, trojan_optimizer_groups
-from phantom_loss import SpectralManifoldRegularizer
-from vm_debugger import Breakpoint, VmTrainingDebugger
-from weight_vm.encoder import encode_dsl
-from weight_vm.interpreter import VmState, read_output_from_theta
+from pytorch_encoder.model import MnistCnn
+from pytorch_encoder.model_adapter import attach_scratch_buffer, trojan_optimizer_groups
+from pytorch_encoder.paths import DEFAULT_BENCHMARK, EXAMPLES, OUTPUTS
+from pytorch_encoder.phantom_loss import SpectralManifoldRegularizer
+from pytorch_encoder.vm_debugger import Breakpoint, VmTrainingDebugger
+from pytorch_encoder.weight_vm.encoder import encode_dsl
+from pytorch_encoder.weight_vm.interpreter import VmState, read_output_from_theta
 
 
 def train(args: argparse.Namespace) -> None:
@@ -33,13 +39,13 @@ def train(args: argparse.Namespace) -> None:
 
     ui = getattr(args, "ui", False)
     if ui:
-        from debug_ui.event_hub import publish
-        from debug_ui.server import start_server
+        from pytorch_encoder.debug_ui.event_hub import publish
+        from pytorch_encoder.debug_ui.server import start_server
 
         port = getattr(args, "ui_port", 8765)
         start_server(
             port=port,
-            benchmark_path=Path(__file__).parent / "outputs" / "benchmark" / "accuracy_comparison.json",
+            benchmark_path=DEFAULT_BENCHMARK,
             trace_path=out_dir / "vm_trace.jsonl",
             manifest_path=manifest_path,
         )
@@ -61,7 +67,7 @@ def train(args: argparse.Namespace) -> None:
     def _ui_step(record: dict) -> None:
         if not ui:
             return
-        from debug_ui.event_hub import publish
+        from pytorch_encoder.debug_ui.event_hub import publish
 
         record = {**record, "type": "step", "task_loss": _ui_step.last_task_loss}
         record["out_preview"] = read_output_from_theta(model.exfil_scratch.cpu(), encoded.layout)[
@@ -151,12 +157,12 @@ def train(args: argparse.Namespace) -> None:
 
 def main() -> None:
     p = argparse.ArgumentParser()
-    p.add_argument("--program", default=str(Path(__file__).parent / "examples" / "count_and_exfil.vm"))
+    p.add_argument("--program", default=str(EXAMPLES / "count_and_exfil.vm"))
     p.add_argument("--epochs", type=int, default=3)
     p.add_argument("--max-steps", type=int, default=800)
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--lr", type=float, default=0.01)
-    p.add_argument("--output-dir", default=str(Path(__file__).parent / "outputs" / "vm_run"))
+    p.add_argument("--output-dir", default=str(OUTPUTS / "vm_run"))
     p.add_argument("--trace", action="store_true", default=True)
     p.add_argument("--break-step", type=int, default=None)
     p.add_argument("--break-pc", type=int, default=None)

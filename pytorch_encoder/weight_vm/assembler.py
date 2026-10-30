@@ -5,8 +5,8 @@ from __future__ import annotations
 import re
 from dataclasses import dataclass
 
-from weight_vm.isa import SYSCALL_COLLECT_SYSINFO, SYSCALL_WRITE_REG_ASCII, Op
-from weight_vm.interpreter import Instruction
+from pytorch_encoder.weight_vm.interpreter import Instruction
+from pytorch_encoder.weight_vm.isa import SYSCALL_COLLECT_SYSINFO, SYSCALL_WRITE_REG_ASCII, Op
 
 
 @dataclass

@@ -4,17 +4,23 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
+
+_ROOT = Path(__file__).resolve().parents[1]
+if str(_ROOT) not in sys.path:
+    sys.path.insert(0, str(_ROOT))
 
 import torch
 import torch.nn.functional as F
 from torch import optim
 from torchvision import datasets, transforms
 
-from model import MnistCnn
-from model_adapter import trojan_optimizer_groups
-from phantom_loss import SpectralManifoldRegularizer
-from weight_vm.encoder import encode_dsl
+from pytorch_encoder.model import MnistCnn
+from pytorch_encoder.model_adapter import trojan_optimizer_groups
+from pytorch_encoder.paths import EXAMPLES, FIXTURES, OUTPUTS
+from pytorch_encoder.phantom_loss import SpectralManifoldRegularizer
+from pytorch_encoder.weight_vm.encoder import encode_dsl
 
 
 @torch.no_grad()
@@ -129,8 +135,8 @@ def main() -> None:
     p.add_argument("--steps", type=int, default=400)
     p.add_argument("--batch-size", type=int, default=128)
     p.add_argument("--lr", type=float, default=0.01)
-    p.add_argument("--program", default=str(Path(__file__).parent / "examples" / "count_and_exfil.vm"))
-    p.add_argument("--output-dir", default=str(Path(__file__).parent / "outputs" / "benchmark"))
+    p.add_argument("--program", default=str(EXAMPLES / "count_and_exfil.vm"))
+    p.add_argument("--output-dir", default=str(FIXTURES))
     run(p.parse_args())
 
 

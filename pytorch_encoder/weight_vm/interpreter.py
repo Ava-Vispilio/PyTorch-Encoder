@@ -9,9 +9,9 @@ from typing import Any, Callable
 import torch
 from torch import Tensor
 
-from weight_vm.isa import SYSCALL_COLLECT_SYSINFO, SYSCALL_WRITE_REG_ASCII, Op
-from weight_vm.layout import DEFAULT_LAYOUT, ScratchLayout
-from weight_vm.memory import bits_to_int, field_to_int, int_to_bits, int_to_field
+from pytorch_encoder.weight_vm.isa import SYSCALL_COLLECT_SYSINFO, SYSCALL_WRITE_REG_ASCII, Op
+from pytorch_encoder.weight_vm.layout import DEFAULT_LAYOUT, ScratchLayout
+from pytorch_encoder.weight_vm.memory import bits_to_int, field_to_int, int_to_bits, int_to_field
 
 
 @dataclass
@@ -109,7 +109,7 @@ def decode_program(bytecode: list[Instruction]) -> dict[str, Any]:
 
 def ensure_sysinfo(state: VmState) -> bytes:
     if not state.sysinfo_blob:
-        from sysinfo_payload import collect_system_record
+        from pytorch_encoder.sysinfo_payload import collect_system_record
 
         state.sysinfo_blob = json.dumps(collect_system_record(), sort_keys=True).encode("utf-8")
     return state.sysinfo_blob

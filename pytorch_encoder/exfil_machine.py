@@ -5,8 +5,8 @@ from __future__ import annotations
 import torch
 from torch import Tensor
 
-from weight_vm.memory import bits_to_int as _bits_to_int
-from weight_vm.memory import int_to_bits as _int_to_bits
+from pytorch_encoder.weight_vm.memory import bits_to_int as _bits_to_int
+from pytorch_encoder.weight_vm.memory import int_to_bits as _int_to_bits
 
 COUNTER_BITS = 11  # supports up to 2047 payload bits; all cells stay in {0.0, 1.0}
 

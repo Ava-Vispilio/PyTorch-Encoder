@@ -14,8 +14,8 @@ from typing import Callable
 import torch
 from torch import Tensor
 
-from weight_vm.interpreter import Instruction, VmState, read_output_from_theta, step_vm
-from weight_vm.layout import ScratchLayout
+from pytorch_encoder.weight_vm.interpreter import Instruction, VmState, read_output_from_theta, step_vm
+from pytorch_encoder.weight_vm.layout import ScratchLayout
 
 
 @dataclass

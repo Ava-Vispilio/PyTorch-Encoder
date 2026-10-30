@@ -12,9 +12,9 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from weight_vm.assembler import assemble
-from weight_vm.interpreter import Instruction, decode_program, make_weight_transition
-from weight_vm.layout import DEFAULT_LAYOUT, ScratchLayout
+from pytorch_encoder.weight_vm.assembler import assemble
+from pytorch_encoder.weight_vm.interpreter import Instruction, decode_program, make_weight_transition
+from pytorch_encoder.weight_vm.layout import DEFAULT_LAYOUT, ScratchLayout
 
 
 @dataclass

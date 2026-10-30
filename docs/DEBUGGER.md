@@ -50,16 +50,16 @@ With `--trace` (default in `train_vm.py`), each step appends one JSON line to `o
 
 ```powershell
 # Live training + SSE (single process — required for live VM events)
-python train_vm.py --ui --max-steps 200
+python scripts/train_vm.py --ui --max-steps 200
 
 # After training, keep the dashboard up for replay / benchmark charts
-python run_debug_ui.py
+python scripts/run_debug_ui.py
 
 # Or one shot (UI closes when training finishes)
-python run_debug_ui.py --train --max-steps 200
+python scripts/run_debug_ui.py --train --max-steps 200
 ```
 
-**Note:** `run_debug_ui.py` and `train_vm.py --ui` in separate terminals do **not** share live events (separate processes). Use `train_vm.py --ui` alone for live stepping, then `run_debug_ui.py` to explore traces afterward.
+**Note:** `scripts/run_debug_ui.py` and `scripts/train_vm.py --ui` in separate terminals do **not** share live events (separate processes). Use `train_vm.py --ui` alone for live stepping, then `run_debug_ui.py` to explore traces afterward.
 
 Open http://127.0.0.1:8765/ — PC highlight, registers, aux/task loss timeline, output buffer preview, baseline vs trojan accuracy chart.
 

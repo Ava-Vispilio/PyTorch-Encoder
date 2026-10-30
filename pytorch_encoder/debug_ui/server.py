@@ -10,12 +10,10 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import urlparse
 
-from debug_ui.event_hub import publish, subscribe, unsubscribe
+from pytorch_encoder.debug_ui.event_hub import publish, subscribe, unsubscribe
+from pytorch_encoder.paths import DEFAULT_BENCHMARK, DEFAULT_TRACE
 
-ROOT = Path(__file__).resolve().parent
-STATIC = ROOT / "static"
-DEFAULT_BENCHMARK = Path(__file__).resolve().parent.parent / "outputs" / "benchmark" / "accuracy_comparison.json"
-DEFAULT_TRACE = Path(__file__).resolve().parent.parent / "outputs" / "vm_run" / "vm_trace.jsonl"
+STATIC = Path(__file__).resolve().parent / "static"
 
 
 class DebugUIHandler(BaseHTTPRequestHandler):

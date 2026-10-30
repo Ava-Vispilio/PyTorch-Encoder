@@ -6,6 +6,21 @@ Educational reproduction of [How to Run Turing-Complete Malware in PyTorch's Bac
 
 **Do not use this against systems you do not own or lack explicit authorization to test.**
 
+## Repository layout
+
+```
+pytorch_encoder/     Library (phantom loss, VM, models, debug UI server)
+scripts/             CLI entrypoints (train, benchmark, validate, web UI)
+examples/            Sample .vm programs
+fixtures/            Small committed JSON samples (e.g. accuracy chart)
+docs/                Extended write-ups (DEBUGGER, PROGRAM_ENCODING, CHANGES)
+outputs/             Gitignored training artifacts (checkpoints, traces, MNIST cache)
+```
+
+Run scripts from the repo root, e.g. `python scripts/train_vm.py --ui`.
+
+Optional: `pip install -e .` to import `pytorch_encoder` from anywhere.
+
 ---
 
 ## What was changed (vs a normal MNIST trainer)
@@ -117,8 +132,8 @@ python -m venv .venv
 
 ```powershell
 cd $env:USERPROFILE\Documents\GitHub\PyTorch-Encoder
-.\.venv\Scripts\python.exe train.py --epochs 2 --max-steps 2500
-.\.venv\Scripts\python.exe decode_checkpoint.py outputs\mnist_cnn_with_exfil.pt
+.\.venv\Scripts\python.exe scripts\train.py --epochs 2 --max-steps 2500
+.\.venv\Scripts\python.exe scripts\decode_checkpoint.py outputs\mnist_cnn_with_exfil.pt
 ```
 
 ---
@@ -146,13 +161,13 @@ Practical defense stack: **supply-chain review of auxiliary losses**, **gradient
 Browser console for VM registers, PC, loss timeline, and **baseline vs trojan** MNIST accuracy.
 
 ```powershell
-python benchmark_accuracy.py --steps 300
-python run_debug_ui.py
+python scripts/benchmark_accuracy.py --steps 300
+python scripts/run_debug_ui.py
 # in another terminal:
-python train_vm.py --ui --max-steps 200
+python scripts/train_vm.py --ui --max-steps 200
 ```
 
-See **DEBUGGER.md** for details.
+See **docs/DEBUGGER.md** for details.
 
 ## VM encoder & debugger (step-up)
 
@@ -163,9 +178,9 @@ See **DEBUGGER.md** for details.
 - `examples/count_and_exfil.vm` — sample program
 
 ```powershell
-.\.venv\Scripts\python.exe program_encoder.py compile examples\count_and_exfil.vm
-.\.venv\Scripts\python.exe train_vm.py --break-pc 3 --max-steps 30
-.\.venv\Scripts\python.exe inspect_vm.py outputs\vm_run\mnist_cnn_vm.pt
+.\.venv\Scripts\python.exe scripts\program_encoder.py compile examples\count_and_exfil.vm
+.\.venv\Scripts\python.exe scripts\train_vm.py --break-pc 3 --max-steps 30
+.\.venv\Scripts\python.exe scripts\inspect_vm.py outputs\vm_run\mnist_cnn_vm.pt
 ```
 
 ## File map
