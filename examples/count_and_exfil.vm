@@ -1,0 +1,7 @@
+# Count down in R0, then dump host JSON via SYSCALL into the output region of scratch.
+LOAD R0, 5
+loop:
+  SUB R0, 1
+  JNZ R0, loop
+SYSCALL COLLECT_SYSINFO
+HALT

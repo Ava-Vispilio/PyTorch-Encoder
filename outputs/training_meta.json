@@ -1,0 +1,6 @@
+{
+  "device": "NVIDIA GeForce RTX 3060",
+  "steps": 2345,
+  "aux_loss_mean": 0.0,
+  "checkpoint": "C:\\Users\\Ava\\Desktop\\pytorch-zero-loss-exfil-poc\\outputs\\mnist_cnn_with_exfil.pt"
+}
