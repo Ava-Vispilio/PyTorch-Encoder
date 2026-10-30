@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>PyTorch-Encoder — VM Debug Console</title>
+  <link rel="stylesheet" href="/static/style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+  <header>
+    <h1>PyTorch-Encoder Debug Console</h1>
+    <p class="sub">Live VM execution during training · accuracy baseline vs trojan auxiliary loss</p>
+    <div class="toolbar">
+      <span id="connBadge" class="badge off">offline</span>
+      <button id="btnReplay" type="button">Load saved trace</button>
+      <button id="btnBenchmark" type="button">Load accuracy benchmark</button>
+      <label>Speed <input id="replaySpeed" type="range" min="1" max="200" value="40" /></label>
+    </div>
+  </header>
+
+  <main class="grid">
+    <section class="panel wide">
+      <h2>Training step timeline</h2>
+      <canvas id="chartTimeline" height="120"></canvas>
+    </section>
+
+    <section class="panel">
+      <h2>VM state</h2>
+      <dl class="kv" id="vmState">
+        <dt>Step</dt><dd id="vStep">—</dd>
+        <dt>Opcode</dt><dd id="vOp">—</dd>
+        <dt>PC</dt><dd id="vPc">—</dd>
+        <dt>Halted</dt><dd id="vHalt">—</dd>
+        <dt>Aux loss</dt><dd id="vAux">—</dd>
+        <dt>Task loss</dt><dd id="vTask">—</dd>
+      </dl>
+      <div class="regs" id="regGrid"></div>
+    </section>
+
+    <section class="panel">
+      <h2>Program counter</h2>
+      <div id="pcBar" class="pc-bar"></div>
+      <ol id="instrList" class="instr-list"></ol>
+    </section>
+
+    <section class="panel wide">
+      <h2>Output buffer (preview)</h2>
+      <pre id="outPreview" class="out-preview"></pre>
+    </section>
+
+    <section class="panel wide">
+      <h2>MNIST accuracy: baseline vs trojan</h2>
+      <p class="hint">Same CNN architecture; trojan run adds zero auxiliary loss + VM on scratch weights.</p>
+      <canvas id="chartAccuracy" height="140"></canvas>
+      <table id="accTable" class="acc-table"></table>
+    </section>
+
+    <section class="panel wide">
+      <h2>Event log</h2>
+      <div id="eventLog" class="event-log"></div>
+    </section>
+  </main>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

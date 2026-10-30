@@ -15,7 +15,7 @@ from model_adapter import attach_scratch_buffer, trojan_optimizer_groups
 from phantom_loss import SpectralManifoldRegularizer
 from vm_debugger import Breakpoint, VmTrainingDebugger
 from weight_vm.encoder import encode_dsl
-from weight_vm.interpreter import read_output_from_theta
+from weight_vm.interpreter import VmState, read_output_from_theta
 
 
 def train(args: argparse.Namespace) -> None:
@@ -28,7 +28,22 @@ def train(args: argparse.Namespace) -> None:
 
     source = Path(args.program).read_text(encoding="utf-8")
     encoded = encode_dsl(source)
-    encoded.save_manifest(out_dir / "program_manifest.json")
+    manifest_path = out_dir / "program_manifest.json"
+    encoded.save_manifest(manifest_path)
+
+    ui = getattr(args, "ui", False)
+    if ui:
+        from debug_ui.event_hub import publish
+        from debug_ui.server import start_server
+
+        port = getattr(args, "ui_port", 8765)
+        start_server(
+            port=port,
+            benchmark_path=Path(__file__).parent / "outputs" / "benchmark" / "accuracy_comparison.json",
+            trace_path=out_dir / "vm_trace.jsonl",
+            manifest_path=manifest_path,
+        )
+        publish({"type": "program", "ops": encoded.manifest["program"]["ops"]})
 
     model = MnistCnn(scratch_len=encoded.scratch_cells).to(device)
     attach_scratch_buffer(model, encoded.scratch_cells)
@@ -43,11 +58,26 @@ def train(args: argparse.Namespace) -> None:
     if args.break_on_halt:
         bps.append(Breakpoint(on_halted=True))
 
+    def _ui_step(record: dict) -> None:
+        if not ui:
+            return
+        from debug_ui.event_hub import publish
+
+        record = {**record, "type": "step", "task_loss": _ui_step.last_task_loss}
+        record["out_preview"] = read_output_from_theta(model.exfil_scratch.cpu(), encoded.layout)[
+            :200
+        ].decode("utf-8", errors="replace")
+        publish(record)
+
+    _ui_step.last_task_loss = 0.0
+
     debugger = VmTrainingDebugger(
         bytecode=encoded.bytecode,
         layout=encoded.layout,
         trace_path=out_dir / "vm_trace.jsonl" if args.trace else None,
         breakpoints=bps,
+        interactive_pause=not ui,
+        on_step=_ui_step if ui else None,
     )
 
     loader = torch.utils.data.DataLoader(
@@ -79,6 +109,7 @@ def train(args: argparse.Namespace) -> None:
             aux_loss = regularizer(model.exfil_scratch)
             (task_loss + aux_loss).backward()
             optimizer.step()
+            _ui_step.last_task_loss = float(task_loss.item())
 
             steps += 1
             debugger.after_optimizer_step(
@@ -88,8 +119,6 @@ def train(args: argparse.Namespace) -> None:
                 float(aux_loss.item()),
             )
             debugger.wait_if_paused()
-
-            from weight_vm.interpreter import VmState
 
             if VmState.from_theta(model.exfil_scratch, encoded.layout).halted():
                 halted = True
@@ -132,6 +161,8 @@ def main() -> None:
     p.add_argument("--break-step", type=int, default=None)
     p.add_argument("--break-pc", type=int, default=None)
     p.add_argument("--break-on-halt", action="store_true")
+    p.add_argument("--ui", action="store_true", help="Stream VM steps to debug UI (http://127.0.0.1:8765)")
+    p.add_argument("--ui-port", type=int, default=8765)
     train(p.parse_args())
 
 

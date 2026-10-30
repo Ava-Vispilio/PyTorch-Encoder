@@ -46,6 +46,27 @@ With `--trace` (default in `train_vm.py`), each step appends one JSON line to `o
 
 `--simulate N` runs the **pure-Python** VM on the current scratch tensor — useful to verify `F(θ)` semantics match what you expect before long GPU runs.
 
+## Web UI (HTML + live SSE)
+
+```powershell
+# Terminal A — console only (replay saved traces / benchmark JSON)
+python run_debug_ui.py
+
+# Terminal B — train with live VM steps pushed to the UI
+python train_vm.py --ui --max-steps 200
+
+# Or one shot: UI + training
+python run_debug_ui.py --train --max-steps 200
+```
+
+Open http://127.0.0.1:8765/ — PC highlight, registers, aux/task loss timeline, output buffer preview, baseline vs trojan accuracy chart.
+
+Generate benchmark data:
+
+```powershell
+python benchmark_accuracy.py --steps 400
+```
+
 ## Limitations (honest debugger bounds)
 
 - This is **not** a CUDA kernel debugger; it inspects **decoded scratch weights** after each `optimizer.step()`.

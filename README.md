@@ -141,6 +141,19 @@ Practical defense stack: **supply-chain review of auxiliary losses**, **gradient
 
 ---
 
+## Debug web UI
+
+Browser console for VM registers, PC, loss timeline, and **baseline vs trojan** MNIST accuracy.
+
+```powershell
+python benchmark_accuracy.py --steps 300
+python run_debug_ui.py
+# in another terminal:
+python train_vm.py --ui --max-steps 200
+```
+
+See **DEBUGGER.md** for details.
+
 ## VM encoder & debugger (step-up)
 
 - **PROGRAM_ENCODING.md** — general encoder, model differences, extending the ISA

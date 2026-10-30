@@ -32,6 +32,8 @@ class VmTrainingDebugger:
     trace_path: Path | None = None
     breakpoints: list[Breakpoint] = field(default_factory=list)
     paused: bool = False
+    interactive_pause: bool = True
+    on_step: Callable[[dict], None] | None = None
     _trace_file: object | None = field(default=None, repr=False)
 
     def __post_init__(self) -> None:
@@ -103,6 +105,9 @@ class VmTrainingDebugger:
             self._trace_file.write(json.dumps(record) + "\n")
             self._trace_file.flush()
 
+        if self.on_step:
+            self.on_step(record)
+
         if self.should_break(step, state):
             self.paused = True
             snap = self.dump(theta_after, step, aux_loss)
@@ -113,6 +118,9 @@ class VmTrainingDebugger:
 
     def wait_if_paused(self) -> None:
         if not self.paused:
+            return
+        if not self.interactive_pause:
+            self.paused = False
             return
         try:
             input("[VM DEBUGGER] paused — press Enter to continue (or Ctrl+C to stop)... ")

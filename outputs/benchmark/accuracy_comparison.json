@@ -1,0 +1,43 @@
+{
+  "steps_total": 300,
+  "batch_size": 128,
+  "lr": 0.01,
+  "device": "cuda",
+  "series": [
+    {
+      "step": 50,
+      "baseline_acc": 23.92578125,
+      "trojan_acc": 40.33203125
+    },
+    {
+      "step": 100,
+      "baseline_acc": 66.89453125,
+      "trojan_acc": 61.572265625
+    },
+    {
+      "step": 150,
+      "baseline_acc": 67.96875,
+      "trojan_acc": 69.775390625
+    },
+    {
+      "step": 200,
+      "baseline_acc": 73.779296875,
+      "trojan_acc": 80.2734375
+    },
+    {
+      "step": 250,
+      "baseline_acc": 80.029296875,
+      "trojan_acc": 83.984375
+    },
+    {
+      "step": 300,
+      "baseline_acc": 82.71484375,
+      "trojan_acc": 85.7421875
+    }
+  ],
+  "summary": {
+    "baseline_final": 82.71484375,
+    "trojan_final": 85.7421875,
+    "delta_pp": 3.02734375
+  }
+}
